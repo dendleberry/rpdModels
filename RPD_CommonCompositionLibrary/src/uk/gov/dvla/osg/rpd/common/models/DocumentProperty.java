@@ -1,6 +1,6 @@
 package uk.gov.dvla.osg.rpd.common.models;
 
-public class DocumentProperties {
+public class DocumentProperty {
 	private String docAVScanCount, docAddress1, docAddress2, docAddress3, 
 	docAddress4, docAddress5, docAddress6, docAddress7, docAddressCity, 
 	docAddressCityStateZip, docAddressCompany, docAddressCountry, 

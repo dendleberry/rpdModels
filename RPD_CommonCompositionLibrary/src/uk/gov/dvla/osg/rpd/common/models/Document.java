@@ -6,6 +6,7 @@ public class Document {
 	private String documentArtwork, documentId;
 	private boolean documentIsLastInGroup, documentIsFirstInTray, documentIsDuplex;
 	private int numberOfPagesInDocument;
+	private DocumentProperty documentProperty;
 	
 	public Address getAddress() {
 		return address;
@@ -54,5 +55,11 @@ public class Document {
 	}
 	public void setNumberOfPagesInDocument(int numberOfPagesInDocument) {
 		this.numberOfPagesInDocument = numberOfPagesInDocument;
+	}
+	public DocumentProperty getDocumentProperty() {
+		return documentProperty;
+	}
+	public void setDocumentProperty(DocumentProperty documentProperty) {
+		this.documentProperty = documentProperty;
 	}
 }
