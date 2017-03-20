@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class DocumentProperty {
+	
 	private String docAVScanCount, docAddress1, docAddress2, docAddress3, 
 	docAddress4, docAddress5, docAddress6, docAddress7, docAddressCity, 
 	docAddressCityStateZip, docAddressCompany, docAddressCountry, 
@@ -1013,12 +1014,26 @@ public class DocumentProperty {
 			}
 			
 		} catch (NullPointerException e){
-				
+			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
+		} finally {
+			closeReader(reader);
 		}
-			
 		return results;
+	}
+	
+	public static String getHeaderRecordAsString(String inputFilePath){
+		BufferedReader reader = setupReader(inputFilePath);
+		String result = "";
+		try {
+			result = reader.readLine();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			closeReader(reader);
+		}
+		return result;
 	}
 	
 	private static BufferedReader setupReader(String input) {
@@ -1038,5 +1053,13 @@ public class DocumentProperty {
 			results.put(fields[i], i);
 		}
 		return results;
+	}
+	
+	private static void closeReader(BufferedReader reader){
+		try {
+			reader.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }
