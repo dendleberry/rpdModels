@@ -5,7 +5,7 @@ import java.util.List;
 public class Batch {
 	private String batchId, batchType, stationery, formDef;
 	private int batchSequence, noOfPagesInBatch, noOfGroupsInBatch;
-	private List<Item> items;
+	private List<Envelope> envelopes;
 	
 	public String getBatchId() {
 		return batchId;
@@ -49,10 +49,10 @@ public class Batch {
 	public void setNoOfGroupsInBatch(int noOfGroupsInBatch) {
 		this.noOfGroupsInBatch = noOfGroupsInBatch;
 	}
-	public List<Item> getItems() {
-		return items;
+	public List<Envelope> getEnvelopes() {
+		return envelopes;
 	}
-	public void setItems(List<Item> items) {
-		this.items = items;
+	public void setEnvelopes(List<Envelope> envelopes) {
+		this.envelopes = envelopes;
 	}
 }

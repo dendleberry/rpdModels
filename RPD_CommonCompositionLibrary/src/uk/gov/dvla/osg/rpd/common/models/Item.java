@@ -1,19 +1,19 @@
 package uk.gov.dvla.osg.rpd.common.models;
 
 public class Item {
-	private int itemSequence;
-	private Document document;
+	private String itemName;
+	private Dimensions itemDimensions;
 	
-	public int getItemSequence() {
-		return itemSequence;
+	public String getItemName() {
+		return itemName;
 	}
-	public void setItemSequence(int itemSequence) {
-		this.itemSequence = itemSequence;
+	public void setItemName(String itemName) {
+		this.itemName = itemName;
 	}
-	public Document getDocument() {
-		return document;
+	public Dimensions getItemDimensions() {
+		return itemDimensions;
 	}
-	public void setDocument(Document document) {
-		this.document = document;
+	public void setItemDimensions(Dimensions dimensions) {
+		this.itemDimensions = dimensions;
 	}
 }

@@ -5,7 +5,7 @@ import java.util.List;
 public class Tray {
 	private String trayTicket;
 	private List<Envelope> envelopesInTray;
-	private int trayVolume;
+	private int numberOfEnvelopesInTray;
 	private Dimensions dimensions;
 	
 	public String getTrayTicket() {
@@ -21,10 +21,10 @@ public class Tray {
 		this.envelopesInTray = envelopesInTray;
 	}
 	public int getTrayVolume() {
-		return trayVolume;
+		return numberOfEnvelopesInTray;
 	}
 	public void setTrayVolume(int trayVolume) {
-		this.trayVolume = trayVolume;
+		this.numberOfEnvelopesInTray = trayVolume;
 	}
 	public Dimensions getDimensions() {
 		return dimensions;

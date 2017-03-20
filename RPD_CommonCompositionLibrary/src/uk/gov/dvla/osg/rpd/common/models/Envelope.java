@@ -4,8 +4,9 @@ import java.util.List;
 
 public class Envelope {
 	private String envelopeName,envelopeReversion;
-	private List<Content> contents;
-	private Dimensions dimensions;
+	private List<DocumentProperty> documentProperties;
+	private List<Item> items;
+	private Dimensions envelopeDimensions;
 	
 	public String getEnvelopeName() {
 		return envelopeName;
@@ -19,16 +20,22 @@ public class Envelope {
 	public void setEnvelopeReversion(String envelopeReversion) {
 		this.envelopeReversion = envelopeReversion;
 	}
-	public List<Content> getContents() {
-		return contents;
+	public List<DocumentProperty> getDocumentProperties() {
+		return documentProperties;
 	}
-	public void setContents(List<Content> contents) {
-		this.contents = contents;
+	public void setDocumentProperties(List<DocumentProperty> documentProperties) {
+		this.documentProperties = documentProperties;
 	}
-	public Dimensions getDimensions() {
-		return dimensions;
+	public List<Item> getItems() {
+		return items;
 	}
-	public void setDimensions(Dimensions dimensions) {
-		this.dimensions = dimensions;
+	public void setItems(List<Item> items) {
+		this.items = items;
+	}
+	public Dimensions getEnvelopeDimensions() {
+		return envelopeDimensions;
+	}
+	public void setEnvelopeDimensions(Dimensions dimensions) {
+		this.envelopeDimensions = dimensions;
 	}
 }
