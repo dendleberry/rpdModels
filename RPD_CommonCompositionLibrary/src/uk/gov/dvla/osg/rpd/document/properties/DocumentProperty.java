@@ -1,4 +1,12 @@
-package uk.gov.dvla.osg.rpd.common.models;
+package uk.gov.dvla.osg.rpd.document.properties;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class DocumentProperty {
 	private String docAVScanCount, docAddress1, docAddress2, docAddress3, 
@@ -850,5 +858,185 @@ public class DocumentProperty {
 	}
 	public void setJobName(String jobName) {
 		this.jobName = jobName;
+	}
+	public static ArrayList<DocumentProperty> getDocumentPropertiesFromTabDelimittedFile(String filepath){
+		ArrayList<DocumentProperty> results = new ArrayList<DocumentProperty>();
+		BufferedReader reader = setupReader(filepath);
+		String readLine;
+		boolean firstLine = true;
+		HashMap<String, Integer> fieldIdxs = null;
+		try{
+			while( (readLine = reader.readLine() ) != null ) {
+				String[] fields = readLine.split("\\t",-1);
+				if( firstLine ){
+					fieldIdxs = getInputFileFieldIdxs(fields);
+					firstLine=false;
+				} else {
+					DocumentProperty dp = new DocumentProperty();
+					dp.setDocAVScanCount(fields[fieldIdxs.get("Doc.AV.ScanCount")]);
+					dp.setDocAddress1(fields[fieldIdxs.get("Doc.Address.1")]);
+					dp.setDocAddress2(fields[fieldIdxs.get("Doc.Address.2")]);
+					dp.setDocAddress3(fields[fieldIdxs.get("Doc.Address.3")]);
+					dp.setDocAddress4(fields[fieldIdxs.get("Doc.Address.4")]);
+					dp.setDocAddress5(fields[fieldIdxs.get("Doc.Address.5")]);
+					dp.setDocAddress6(fields[fieldIdxs.get("Doc.Address.6")]);
+					dp.setDocAddress7(fields[fieldIdxs.get("Doc.Address.7")]);
+					dp.setDocAddressCity(fields[fieldIdxs.get("Doc.Address.City")]);
+					dp.setDocAddressCityStateZip(fields[fieldIdxs.get("Doc.Address.CityStateZip")]);
+					dp.setDocAddressCompany(fields[fieldIdxs.get("Doc.Address.Company")]);
+					dp.setDocAddressCountry(fields[fieldIdxs.get("Doc.Address.Country")]);
+					dp.setDocAddressDeliveryPoint(fields[fieldIdxs.get("Doc.Address.DeliveryPoint")]);
+					dp.setDocAddressFullName(fields[fieldIdxs.get("Doc.Address.FullName")]);
+					dp.setDocAddressOther(fields[fieldIdxs.get("Doc.Address.Other")]);
+					dp.setDocAddressPostalCode(fields[fieldIdxs.get("Doc.Address.PostalCode")]);
+					dp.setDocAddressPrimary(fields[fieldIdxs.get("Doc.Address.Primary")]);
+					dp.setDocAddressProvince(fields[fieldIdxs.get("Doc.Address.Province")]);
+					dp.setDocAddressSecondary(fields[fieldIdxs.get("Doc.Address.Secondary")]);
+					dp.setDocAddressState(fields[fieldIdxs.get("Doc.Address.State")]);
+					dp.setDocAddressUrbanization(fields[fieldIdxs.get("Doc.Address.Urbanization")]);
+					dp.setDocAddressZipCode(fields[fieldIdxs.get("Doc.Address.ZipCode")]);
+					dp.setDocChildJobID(fields[fieldIdxs.get("Doc.ChildJobID")]);
+					dp.setDocCombinedDocID(fields[fieldIdxs.get("Doc.CombinedDocID")]);
+					dp.setDocCombinedDocument(fields[fieldIdxs.get("Doc.CombinedDocument")]);
+					dp.setDocCombinedOriginalJobID(fields[fieldIdxs.get("Doc.CombinedOriginalJobID")]);
+					dp.setDocCombinedSequence(fields[fieldIdxs.get("Doc.CombinedSequence")]);
+					dp.setDocDVLAAccountNo(fields[fieldIdxs.get("Doc.DVLA.AccountNo")]);
+					dp.setDocDVLAAddress1(fields[fieldIdxs.get("Doc.DVLA.Address1")]);
+					dp.setDocDVLAAddress2(fields[fieldIdxs.get("Doc.DVLA.Address2")]);
+					dp.setDocDVLAAddress3(fields[fieldIdxs.get("Doc.DVLA.Address3")]);
+					dp.setDocDVLAAddress4(fields[fieldIdxs.get("Doc.DVLA.Address4")]);
+					dp.setDocDVLAAddress5(fields[fieldIdxs.get("Doc.DVLA.Address5")]);
+					dp.setDocDVLAAppName(fields[fieldIdxs.get("Doc.DVLA.AppName")]);
+					dp.setDocDVLABatchType(fields[fieldIdxs.get("Doc.DVLA.BatchType")]);
+					dp.setDocDVLAColour(fields[fieldIdxs.get("Doc.DVLA.Colour")]);
+					dp.setDocDVLADPS(fields[fieldIdxs.get("Doc.DVLA.DPS")]);
+					dp.setDocDVLADocType(fields[fieldIdxs.get("Doc.DVLA.DocType")]);
+					dp.setDocDVLAEndOfGroup(fields[fieldIdxs.get("Doc.DVLA.EndOfGroup")]);
+					dp.setDocDVLAEndOfTray(fields[fieldIdxs.get("Doc.DVLA.EndOfTray")]);
+					dp.setDocDVLAEnvelope(fields[fieldIdxs.get("Doc.DVLA.Envelope")]);
+					dp.setDocDVLAFleetNo(fields[fieldIdxs.get("Doc.DVLA.FleetNo")]);
+					dp.setDocDVLAGroupId(fields[fieldIdxs.get("Doc.DVLA.GroupId")]);
+					dp.setDocDVLAInsertPack(fields[fieldIdxs.get("Doc.DVLA.InsertPack")]);
+					dp.setDocDVLALanguage(fields[fieldIdxs.get("Doc.DVLA.Language")]);
+					dp.setDocDVLAMailerBarcode(fields[fieldIdxs.get("Doc.DVLA.MailerBarcode")]);
+					dp.setDocDVLAMailerFunctions(fields[fieldIdxs.get("Doc.DVLA.MailerFunctions")]);
+					dp.setDocDVLAMailingProduct(fields[fieldIdxs.get("Doc.DVLA.MailingProduct")]);
+					dp.setDocDVLAMailmarkBarcode(fields[fieldIdxs.get("Doc.DVLA.MailmarkBarcode")]);
+					dp.setDocDVLAMailsortCode(fields[fieldIdxs.get("Doc.DVLA.MailsortCode")]);
+					dp.setDocDVLAName1(fields[fieldIdxs.get("Doc.DVLA.Name1")]);
+					dp.setDocDVLAName2(fields[fieldIdxs.get("Doc.DVLA.Name2")]);
+					dp.setDocDVLAOTT(fields[fieldIdxs.get("Doc.DVLA.OTT")]);
+					dp.setDocDVLAOriginalRunDate(fields[fieldIdxs.get("Doc.DVLA.OriginalRunDate")]);
+					dp.setDocDVLAOriginalRunNo(fields[fieldIdxs.get("Doc.DVLA.OriginalRunNo")]);
+					dp.setDocDVLAPaperSize(fields[fieldIdxs.get("Doc.DVLA.PaperSize")]);
+					dp.setDocDVLAPlex(fields[fieldIdxs.get("Doc.DVLA.Plex")]);
+					dp.setDocDVLAPostCode(fields[fieldIdxs.get("Doc.DVLA.PostCode")]);
+					dp.setDocDVLARef(fields[fieldIdxs.get("Doc.DVLA.Ref")]);
+					dp.setDocDVLARef2(fields[fieldIdxs.get("Doc.DVLA.Ref2")]);
+					dp.setDocDVLARunDate(fields[fieldIdxs.get("Doc.DVLA.RunDate")]);
+					dp.setDocDVLARunNo(fields[fieldIdxs.get("Doc.DVLA.RunNo")]);
+					dp.setDocDVLASelectorName(fields[fieldIdxs.get("Doc.DVLA.SelectorName")]);
+					dp.setDocDVLASerialNo(fields[fieldIdxs.get("Doc.DVLA.SerialNo")]);
+					dp.setDocDVLASite(fields[fieldIdxs.get("Doc.DVLA.Site")]);
+					dp.setDocDVLASortField(fields[fieldIdxs.get("Doc.DVLA.SortField")]);
+					dp.setDocDVLAStationery(fields[fieldIdxs.get("Doc.DVLA.Stationery")]);
+					dp.setDocDVLAStreamingCode(fields[fieldIdxs.get("Doc.DVLA.StreamingCode")]);
+					dp.setDocDVLASubBatchType(fields[fieldIdxs.get("Doc.DVLA.SubBatchType")]);
+					dp.setDocDVLATitle(fields[fieldIdxs.get("Doc.DVLA.Title")]);
+					dp.setDocDVLATotalPagesInGroup(fields[fieldIdxs.get("Doc.DVLA.TotalPagesInGroup")]);
+					dp.setDocDataLen(fields[fieldIdxs.get("Doc.DataLen")]);
+					dp.setDocDataOffset(fields[fieldIdxs.get("Doc.DataOffset")]);
+					dp.setDocDocSizePieceThickness(fields[fieldIdxs.get("Doc.DocSize.PieceThickness")]);
+					dp.setDocDocSizePieceWeight(fields[fieldIdxs.get("Doc.DocSize.PieceWeight")]);
+					dp.setDocDueOut(fields[fieldIdxs.get("Doc.DueOut")]);
+					dp.setDocEmailAddress(fields[fieldIdxs.get("Doc.EmailAddress")]);
+					dp.setDocEmailSent(fields[fieldIdxs.get("Doc.Email.Sent")]);
+					dp.setDocID(fields[fieldIdxs.get("Doc.ID")]);
+					dp.setDocInsertBinResults(fields[fieldIdxs.get("Doc.Insert.BinResults")]);
+					dp.setDocInsertBinTriggers(fields[fieldIdxs.get("Doc.Insert.BinTriggers")]);
+					dp.setDocInsertDisposition(fields[fieldIdxs.get("Doc.Insert.Disposition")]);
+					dp.setDocInsertDivertBin(fields[fieldIdxs.get("Doc.Insert.DivertBin")]);
+					dp.setDocInsertInserterID(fields[fieldIdxs.get("Doc.Insert.InserterID")]);
+					dp.setDocInsertIteration(fields[fieldIdxs.get("Doc.Insert.Iteration")]);
+					dp.setDocInsertOperatorID(fields[fieldIdxs.get("Doc.Insert.OperatorID")]);
+					dp.setDocInsertOriginalBarCode(fields[fieldIdxs.get("Doc.Insert.OriginalBarCode")]);
+					dp.setDocInsertPendingDisposition(fields[fieldIdxs.get("Doc.Insert.PendingDisposition")]);
+					dp.setDocInsertRecipientName(fields[fieldIdxs.get("Doc.Insert.RecipientName")]);
+					dp.setDocInsertSequence(fields[fieldIdxs.get("Doc.Insert.Sequence")]);
+					dp.setDocInsertStatus(fields[fieldIdxs.get("Doc.Insert.Status")]);
+					dp.setDocInsertTimeStamp(fields[fieldIdxs.get("Doc.Insert.TimeStamp")]);
+					dp.setDocInserterStatusCode(fields[fieldIdxs.get("Doc.Inserter.StatusCode")]);
+					dp.setDocInserterStatusCodeExtended(fields[fieldIdxs.get("Doc.Inserter.StatusCodeExtended")]);
+					dp.setDocMadeAvailableByJobId(fields[fieldIdxs.get("Doc.MadeAvailableByJobId")]);
+					dp.setDocMemberNumber(fields[fieldIdxs.get("Doc.Member.Number")]);
+					dp.setDocOriginalFirstPage(fields[fieldIdxs.get("Doc.OriginalFirstPage")]);
+					dp.setDocOriginalJobID(fields[fieldIdxs.get("Doc.OriginalJobID")]);
+					dp.setDocOriginalPages(fields[fieldIdxs.get("Doc.OriginalPages")]);
+					dp.setDocOriginalSequence(fields[fieldIdxs.get("Doc.OriginalSequence")]);
+					dp.setDocOriginalSheets(fields[fieldIdxs.get("Doc.OriginalSheets")]);
+					dp.setDocPDZSOriginalInputFile(fields[fieldIdxs.get("Doc.PDZS.OriginalInputFile")]);
+					dp.setDocPersistentID(fields[fieldIdxs.get("Doc.Persistent.ID")]);					
+					dp.setDocPostalAddressProcessingRC(fields[fieldIdxs.get("Doc.Postal.AddressProcessingRC")]);
+					dp.setDocPostalCategory(fields[fieldIdxs.get("Doc.Postal.Category")]);
+					dp.setDocPostalChangeAddressRC(fields[fieldIdxs.get("Doc.Postal.ChangeAddressRC")]);
+					dp.setDocPostalContainerBreakMark(fields[fieldIdxs.get("Doc.Postal.ContainerBreakMark")]);
+					dp.setDocPostalContainerNumber(fields[fieldIdxs.get("Doc.Postal.ContainerNumber")]);
+					dp.setDocPostalHandlingUnitBreakMark(fields[fieldIdxs.get("Doc.Postal.HandlingUnitBreakMark")]);
+					dp.setDocPostalHandlingUnitNumber(fields[fieldIdxs.get("Doc.Postal.HandlingUnitNumber")]);
+					dp.setDocPostalPackageBreakMark(fields[fieldIdxs.get("Doc.Postal.PackageBreakMark")]);
+					dp.setDocPostalPackageNumber(fields[fieldIdxs.get("Doc.Postal.PackageNumber")]);
+					dp.setDocPostalPostageRate(fields[fieldIdxs.get("Doc.Postal.PostageRate")]);
+					dp.setDocPostalPostageRateCode(fields[fieldIdxs.get("Doc.Postal.PostageRateCode")]);
+					dp.setDocPostalSequenceNumber(fields[fieldIdxs.get("Doc.Postal.SequenceNumber")]);
+					dp.setDocPostalSequencingProcessingRC(fields[fieldIdxs.get("Doc.Postal.SequencingProcessingRC")]);
+					dp.setDocPull(fields[fieldIdxs.get("Doc.Pull")]);
+					dp.setDocPullProp(fields[fieldIdxs.get("Doc.PullProp")]);
+					dp.setDocSaveAll(fields[fieldIdxs.get("Doc.SaveAll")]);
+					dp.setDocSequenceInChild(fields[fieldIdxs.get("Doc.SequenceInChild")]);
+					dp.setDocSourceFileName(fields[fieldIdxs.get("Doc.SourceFileName")]);
+					dp.setDocTTBarcodeScanTime1(fields[fieldIdxs.get("Doc.TT.BarcodeScanTime1")]);
+					dp.setDocTTBarcodeScanTime2(fields[fieldIdxs.get("Doc.TT.BarcodeScanTime2")]);
+					dp.setDocTTBarcodeScanTime3(fields[fieldIdxs.get("Doc.TT.BarcodeScanTime3")]);
+					dp.setDocTTBarcodeScanTime4(fields[fieldIdxs.get("Doc.TT.BarcodeScanTime4")]);
+					dp.setDocTTBarcodeScanTime5(fields[fieldIdxs.get("Doc.TT.BarcodeScanTime5")]);
+					dp.setDocTTBarcodeStatus1(fields[fieldIdxs.get("Doc.TT.BarcodeStatus1")]);
+					dp.setDocTTBarcodeStatus2(fields[fieldIdxs.get("Doc.TT.BarcodeStatus2")]);
+					dp.setDocTTBarcodeStatus3(fields[fieldIdxs.get("Doc.TT.BarcodeStatus3")]);
+					dp.setDocTTBarcodeStatus4(fields[fieldIdxs.get("Doc.TT.BarcodeStatus4")]);
+					dp.setDocTTBarcodeStatus5(fields[fieldIdxs.get("Doc.TT.BarcodeStatus5")]);
+					dp.setDocTTJobID(fields[fieldIdxs.get("Doc.TT.JobID")]);
+					dp.setDocVerificationRecipient(fields[fieldIdxs.get("Doc.Verification.Recipient")]);
+					dp.setJobHostUserID(fields[fieldIdxs.get("Job.Host.UserID")]);
+					dp.setJobName(fields[fieldIdxs.get("Job.Name")]);
+					results.add(dp);
+				}
+			}
+			
+		} catch (NullPointerException e){
+				
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+			
+		return results;
+	}
+	
+	private static BufferedReader setupReader(String input) {
+        try {
+        	File inputFile = new File(input);
+			BufferedReader b = new BufferedReader(new FileReader(inputFile));
+			return b;
+		} catch (FileNotFoundException e) {
+			System.exit(1);
+		}
+		return null;
+	}
+	
+	private static HashMap<String, Integer> getInputFileFieldIdxs(String[] fields) {
+		HashMap<String, Integer> results = new HashMap<String, Integer>();
+		for(int i = 0 ; i < fields.length ; i ++){
+			results.put(fields[i], i);
+		}
+		return results;
 	}
 }

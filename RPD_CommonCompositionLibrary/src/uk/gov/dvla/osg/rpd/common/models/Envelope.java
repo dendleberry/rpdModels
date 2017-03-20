@@ -2,6 +2,8 @@ package uk.gov.dvla.osg.rpd.common.models;
 
 import java.util.List;
 
+import uk.gov.dvla.osg.rpd.document.properties.DocumentProperty;
+
 public class Envelope {
 	private String envelopeName,envelopeReversion;
 	private List<DocumentProperty> documentProperties;
