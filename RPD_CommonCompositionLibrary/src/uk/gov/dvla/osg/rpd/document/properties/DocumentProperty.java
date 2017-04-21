@@ -23,9 +23,9 @@ public class DocumentProperty {
 	docDVLAEndOfTray, docDVLAEnvelope, docDVLAFleetNo, docDVLAGroupId, docDVLAInsertPack, 
 	docDVLALanguage, docDVLAMailerBarcode, docDVLAMailerFunctions, docDVLAMailingProduct, 
 	docDVLAMailmarkBarcode, docDVLAMailsortCode, docDVLAName1, docDVLAName2, 
-	docDVLAOTT, docDVLAOriginalRunDate, docDVLAOriginalRunNo, docDVLAPaperSize, 
-	docDVLAPlex, docDVLAPostCode, docDVLARef, docDVLARef2, docDVLARunDate, docDVLARunNo, 
-	docDVLASelectorName, docDVLASerialNo, docDVLASite, docDVLASortField, 
+	docDVLAOTT, docDVLAOriginalBatchType, docDVLAOriginalRunDate, docDVLAOriginalRunNo, 
+	docDVLAPaperSize, docDVLAPlex, docDVLAPostCode, docDVLARef, docDVLARef2, docDVLARunDate, 
+	docDVLARunNo, docDVLASelectorName, docDVLASerialNo, docDVLASite, docDVLASortField, 
 	docDVLAStationery, docDVLAStreamingCode, docDVLASubBatchType, docDVLATitle, 
 	docDVLATotalPagesInGroup, docDataLen, docDataOffset, docDocSizePieceThickness, 
 	docDocSizePieceWeight, docDueOut, docEmailAddress, docEmailSent, docID, 
@@ -364,6 +364,12 @@ public class DocumentProperty {
 	}
 	public void setDocDVLAOTT(String docDVLAOTT) {
 		this.docDVLAOTT = docDVLAOTT;
+	}
+	public String getDocDVLAOriginalBatchType() {
+		return docDVLAOriginalBatchType;
+	}
+	public void setDocDVLAOriginalBatchType(String docDVLAOriginalBatchType) {
+		this.docDVLAOriginalBatchType = docDVLAOriginalBatchType;
 	}
 	public String getDocDVLAOriginalRunDate() {
 		return docDVLAOriginalRunDate;
