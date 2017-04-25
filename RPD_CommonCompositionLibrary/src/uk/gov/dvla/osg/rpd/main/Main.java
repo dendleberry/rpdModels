@@ -30,6 +30,7 @@ public class Main {
 	private static String inputFilePath, outputFilePath, propsFilePath, parentJobId, runNo;
 	private static SelectorLookup selectorLookup;
 	private static SessionParameterInterface params;
+	private static Sorter sorter;
 	
 	public static void main(String[] args) {
 		validateArgs(args);
@@ -39,6 +40,8 @@ public class Main {
 		applicationProperties = getPropertiesFromPropertiesFile(propsFilePath);
 		selectorLookup = loadSelectorLookup();
 		params = getParameters();
+		new CalculateBatchTypes(params).calculateBatchTypes();
+		sorter = new Sorter(params);
 		
 	}
 	
@@ -109,9 +112,14 @@ public class Main {
 		String productionConfigurationPath = getProductionConfigPath(applicationProperties, selectorLookup);
 		String postageConfigurationPath = getPostageConfigPath(applicationProperties, selectorLookup);
 		String presentationPriorityPath = getPresPriorityConfigPath(applicationProperties, selectorLookup);
+		params.setProductionConfigurationPath(productionConfigurationPath);
+		params.setPostageConfigurationPath(postageConfigurationPath);
+		params.setApplicationConfigurationPath(propsFilePath);
+		params.setPresentationPriorityPath(presentationPriorityPath);
 		params.setDocumentProperties(docProps);
 		params.setProductionConfiguration(getPropertiesFromPropertiesFile(productionConfigurationPath));
 		params.setPostageConfiguration(getPropertiesFromPropertiesFile(postageConfigurationPath));
+		params.setApplicationConfiguration(getPropertiesFromPropertiesFile(propsFilePath));
 		params.setPresentationPriority(getPresentationPriorityMap(presentationPriorityPath));
 		params.setJobId(parentJobId);
 		params.setRunNo(runNo);
