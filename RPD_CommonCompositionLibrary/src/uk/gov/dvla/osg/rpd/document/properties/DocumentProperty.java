@@ -1210,4 +1210,106 @@ public class DocumentProperty {
 		sb.append(jobName);
 		return sb.toString();
 	}
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((docDVLAAddress1 == null) ? 0 : docDVLAAddress1.hashCode());
+		result = prime * result
+				+ ((docDVLAAddress2 == null) ? 0 : docDVLAAddress2.hashCode());
+		result = prime * result
+				+ ((docDVLAAddress3 == null) ? 0 : docDVLAAddress3.hashCode());
+		result = prime * result
+				+ ((docDVLAAddress4 == null) ? 0 : docDVLAAddress4.hashCode());
+		result = prime * result
+				+ ((docDVLAAddress5 == null) ? 0 : docDVLAAddress5.hashCode());
+		result = prime * result
+				+ ((docDVLAAppName == null) ? 0 : docDVLAAppName.hashCode());
+		result = prime * result
+				+ ((docDVLAFleetNo == null) ? 0 : docDVLAFleetNo.hashCode());
+		result = prime * result
+				+ ((docDVLAName1 == null) ? 0 : docDVLAName1.hashCode());
+		result = prime * result
+				+ ((docDVLAName2 == null) ? 0 : docDVLAName2.hashCode());
+		result = prime * result
+				+ ((docDVLAOTT == null) ? 0 : docDVLAOTT.hashCode());
+		result = prime * result
+				+ ((docDVLAPostCode == null) ? 0 : docDVLAPostCode.hashCode());
+		result = prime * result
+				+ ((docDVLATitle == null) ? 0 : docDVLATitle.hashCode());
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DocumentProperty other = (DocumentProperty) obj;
+		if (docDVLAAddress1 == null) {
+			if (other.docDVLAAddress1 != null)
+				return false;
+		} else if (!docDVLAAddress1.equals(other.docDVLAAddress1))
+			return false;
+		if (docDVLAAddress2 == null) {
+			if (other.docDVLAAddress2 != null)
+				return false;
+		} else if (!docDVLAAddress2.equals(other.docDVLAAddress2))
+			return false;
+		if (docDVLAAddress3 == null) {
+			if (other.docDVLAAddress3 != null)
+				return false;
+		} else if (!docDVLAAddress3.equals(other.docDVLAAddress3))
+			return false;
+		if (docDVLAAddress4 == null) {
+			if (other.docDVLAAddress4 != null)
+				return false;
+		} else if (!docDVLAAddress4.equals(other.docDVLAAddress4))
+			return false;
+		if (docDVLAAddress5 == null) {
+			if (other.docDVLAAddress5 != null)
+				return false;
+		} else if (!docDVLAAddress5.equals(other.docDVLAAddress5))
+			return false;
+		if (docDVLAAppName == null) {
+			if (other.docDVLAAppName != null)
+				return false;
+		} else if (!docDVLAAppName.equals(other.docDVLAAppName))
+			return false;
+		if (docDVLAFleetNo == null) {
+			if (other.docDVLAFleetNo != null)
+				return false;
+		} else if (!docDVLAFleetNo.equals(other.docDVLAFleetNo))
+			return false;
+		if (docDVLAName1 == null) {
+			if (other.docDVLAName1 != null)
+				return false;
+		} else if (!docDVLAName1.equals(other.docDVLAName1))
+			return false;
+		if (docDVLAName2 == null) {
+			if (other.docDVLAName2 != null)
+				return false;
+		} else if (!docDVLAName2.equals(other.docDVLAName2))
+			return false;
+		if (docDVLAOTT == null) {
+			if (other.docDVLAOTT != null)
+				return false;
+		} else if (!docDVLAOTT.equals(other.docDVLAOTT))
+			return false;
+		if (docDVLAPostCode == null) {
+			if (other.docDVLAPostCode != null)
+				return false;
+		} else if (!docDVLAPostCode.equals(other.docDVLAPostCode))
+			return false;
+		if (docDVLATitle == null) {
+			if (other.docDVLATitle != null)
+				return false;
+		} else if (!docDVLATitle.equals(other.docDVLATitle))
+			return false;
+		return true;
+	}
+	
 }
