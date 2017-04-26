@@ -1,14 +1,21 @@
 package uk.gov.dvla.osg.rpd.document.properties;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class DocumentProperty {
+	private static final Logger LOGGER = LogManager.getLogger();
 	
 	private String docAVScanCount, docAddress1, docAddress2, docAddress3, 
 	docAddress4, docAddress5, docAddress6, docAddress7, docAddressCity, 
@@ -1042,15 +1049,41 @@ public class DocumentProperty {
 		return result;
 	}
 	
-	private static BufferedReader setupReader(String input) {
+	public static BufferedReader setupReader(String file) {
         try {
-        	File inputFile = new File(input);
+        	File inputFile = new File(file);
 			BufferedReader b = new BufferedReader(new FileReader(inputFile));
 			return b;
 		} catch (FileNotFoundException e) {
+			LOGGER.fatal("FileNotFoundException '{}' when procesing file '{}'.", e.getMessage(), file);
 			System.exit(1);
 		}
 		return null;
+	}
+	
+	public static PrintWriter setupWriter(String file) {
+        try {
+        	PrintWriter writer = new PrintWriter(file);
+        
+			return writer;
+		} catch (FileNotFoundException e) {
+			LOGGER.fatal("FileNotFoundException '{}' when procesing file '{}'.", e.getMessage(), file);
+			System.exit(1);
+		}
+		return null;
+	}
+	
+	public static void closeReader(BufferedReader reader){
+		try {
+			reader.close();
+		} catch (IOException e) {
+			LOGGER.fatal("IOException '{}' when procesing file '{}'.", e.getMessage(), reader);
+			System.exit(1);
+		}
+	}
+	
+	public static void closeWriter(PrintWriter writer){
+		writer.close();
 	}
 	
 	private static HashMap<String, Integer> getInputFileFieldIdxs(String[] fields) {
@@ -1059,14 +1092,6 @@ public class DocumentProperty {
 			results.put(fields[i], i);
 		}
 		return results;
-	}
-	
-	private static void closeReader(BufferedReader reader){
-		try {
-			reader.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 	
 	@Override

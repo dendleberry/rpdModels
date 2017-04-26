@@ -1,12 +1,14 @@
 package uk.gov.dvla.osg.rpd.main;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,6 +19,8 @@ import org.apache.logging.log4j.Logger;
 
 import uk.gov.dvla.osg.rpd.abstractions.SessionParameterInterface;
 import uk.gov.dvla.osg.rpd.common.models.SelectorLookup;
+import uk.gov.dvla.osg.rpd.common.processes.CalculateBatchTypes;
+import uk.gov.dvla.osg.rpd.common.processes.Sorter;
 import uk.gov.dvla.osg.rpd.document.properties.DocumentProperty;
 
 import com.google.inject.Guice;
@@ -33,18 +37,23 @@ public class Main {
 	private static Sorter sorter;
 	
 	public static void main(String[] args) {
-		validateArgs(args);
-		assignArgs(args);
 		
+		assignArgs(args);
+		validateArgs(args);
 		docProps = DocumentProperty.getDocumentPropertiesFromTabDelimittedFile(inputFilePath);
 		applicationProperties = getPropertiesFromPropertiesFile(propsFilePath);
 		selectorLookup = loadSelectorLookup();
 		params = getParameters();
+		//sorter = new Sorter(params);
+		
 		new CalculateBatchTypes(params).calculateBatchTypes();
-		sorter = new Sorter(params);
+		
+		writeDpf();
 		
 	}
 	
+
+
 	private static void validateArgs(String[] args) {
 		if( args.length != EXPECTED_NO_OF_ARGS ){
 			LOGGER.fatal("Incorrect number of arguments parsed. Expected {}, recieved {}", EXPECTED_NO_OF_ARGS, args.length);
@@ -62,7 +71,7 @@ public class Main {
 	
 	private static boolean fileExists(String fileToCheck) {
 		boolean result = new File(fileToCheck).exists();
-		LOGGER.debug("fileExists returned '{}' for file '{}'", result, fileToCheck);
+		LOGGER.debug("fileExists({}) returned '{}'", fileToCheck, result);
 		return result;
 	}
 	
@@ -81,16 +90,23 @@ public class Main {
 			input = new FileInputStream(filePath);
 			result.load(input);
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			LOGGER.fatal("File '{}' not found.", filePath);
+			System.exit(1);
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOGGER.fatal("IOException '{}' when procesing file '{}'.", e.getMessage(), filePath);
+			System.exit(1);
+		}catch (IllegalArgumentException e){
+			LOGGER.fatal("IllegalArgumentException '{}' when procesing file '{}'.", e.getMessage(), filePath);
+			System.exit(1);
 		} finally {
 			try {
 				input.close();
 			} catch (IOException e) {
-				e.printStackTrace();
+				LOGGER.fatal("IOException '{}' when procesing file '{}'.", e.getMessage(), filePath);
+				System.exit(1);
 			}
 		}
+		LOGGER.debug("getPropertiesFromPropertiesFile({}) returned '{}'", filePath, result);
 		return result;
 	}
 	
@@ -105,21 +121,23 @@ public class Main {
 			LOGGER.fatal("File '{}' doesn't exist",selectorLookupFile);
 			System.exit(1);
 		}
+		if( result == null ){
+			LOGGER.fatal("Selector '{}' doesn't exist in file '{}'", ref, selectorLookupFile);
+			System.exit(1);
+		}
+		LOGGER.debug("loadSelectorLookup() returned '{}'", result);
 		return result;
 	}
 	
 	private static void initParameters() {
+		LOGGER.debug("initParameters() running..");
 		String productionConfigurationPath = getProductionConfigPath(applicationProperties, selectorLookup);
 		String postageConfigurationPath = getPostageConfigPath(applicationProperties, selectorLookup);
 		String presentationPriorityPath = getPresPriorityConfigPath(applicationProperties, selectorLookup);
-		params.setProductionConfigurationPath(productionConfigurationPath);
-		params.setPostageConfigurationPath(postageConfigurationPath);
-		params.setApplicationConfigurationPath(propsFilePath);
-		params.setPresentationPriorityPath(presentationPriorityPath);
 		params.setDocumentProperties(docProps);
-		params.setProductionConfiguration(getPropertiesFromPropertiesFile(productionConfigurationPath));
-		params.setPostageConfiguration(getPropertiesFromPropertiesFile(postageConfigurationPath));
-		params.setApplicationConfiguration(getPropertiesFromPropertiesFile(propsFilePath));
+		params.addProperties(getPropertiesFromPropertiesFile(productionConfigurationPath));
+		params.addProperties(getPropertiesFromPropertiesFile(postageConfigurationPath));
+		params.addProperties(getPropertiesFromPropertiesFile(propsFilePath));
 		params.setPresentationPriority(getPresentationPriorityMap(presentationPriorityPath));
 		params.setJobId(parentJobId);
 		params.setRunNo(runNo);
@@ -151,6 +169,7 @@ public class Main {
 	}
 
 	private static Map<String,Integer> getPresentationPriorityMap(String filePath){
+		LOGGER.debug("getPresentationPriorityMap() running..");
 		Map<String, Integer> results = new HashMap<String, Integer>();
 		BufferedReader reader = setupReader(filePath);
 		String readLine ="";
@@ -166,21 +185,26 @@ public class Main {
 		} finally {
 			closeReader(reader);
 		}
+		LOGGER.debug("getPresentationPriorityMap returned '{}'", filePath, results);
 		return results;
 	}
 	
 	private static BufferedReader setupReader(String input) {
+		LOGGER.debug("setupReader() running..");
+		BufferedReader result = null;
         try {
         	File inputFile = new File(input);
-			BufferedReader b = new BufferedReader(new FileReader(inputFile));
-			return b;
+        	result = new BufferedReader(new FileReader(inputFile));
+			
 		} catch (FileNotFoundException e) {
+			LOGGER.fatal("FileNotFoundException '{}' when procesing file '{}'.", e.getMessage(), input);
 			System.exit(1);
 		}
-		return null;
+		return result;
 	}
 	
 	private static void closeReader(BufferedReader reader){
+		LOGGER.debug("closeReader() running..");
 		try {
 			reader.close();
 		} catch (IOException e) {
@@ -189,9 +213,20 @@ public class Main {
 	}
 	
 	private static SessionParameterInterface getParameters(){
+		LOGGER.debug("getParameters() running..");
 		Injector injector = Guice.createInjector(new ApplicationInjector());
 		params = injector.getInstance(SessionParameterInterface.class);
 		initParameters();
 		return params;
+	}
+	
+	private static void writeDpf() {
+		LOGGER.debug("writeDpf() running..");
+		PrintWriter w = DocumentProperty.setupWriter(params.getOutputFilePath());
+		w.println(DocumentProperty.getHeaderRecordAsString(inputFilePath));
+		for( DocumentProperty dp : params.getDocumentProperties() ){
+			w.println(dp);
+		}
+		DocumentProperty.closeWriter(w);
 	}
 }

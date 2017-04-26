@@ -50,16 +50,16 @@ public class SelectorLookup {
 		boolean firstLine = true;
 		try {
 			while( (readLine = reader.readLine() ) != null ) {
-				String[] split = readLine.split(delim);
+				String[] split = readLine.split(delim, -1);
 				if( firstLine ){
 					firstLine=false;
 				} else { 
 					SelectorLookup sl = new SelectorLookup();
-					sl.setRef(split[0]);
-					sl.setProductionConfig(split[1]);
-					sl.setPostageConfig(split[2]);
-					sl.setPresentationConfig(split[3]);
-					results.put(split[0], sl);
+					sl.setRef(split[0].trim());
+					sl.setProductionConfig(split[1].trim());
+					sl.setPostageConfig(split[2].trim());
+					sl.setPresentationConfig(split[3].trim());
+					results.put(split[0].trim(), sl);
 				}
 			}
 		} catch (IOException e) {

@@ -1,4 +1,4 @@
-package uk.gov.dvla.osg.rpd.main;
+package uk.gov.dvla.osg.rpd.common.processes;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -95,7 +95,7 @@ public class CalculateBatchTypes {
 	private int getMultiMax() {
 		int result = 0;
 		try{
-			Integer.parseInt((String) params.getApplicationConfiguration().get("maxMulti"));
+			Integer.parseInt((String) params.getProperties().get("maxMulti"));
 		}catch ( NumberFormatException  e){
 			LOGGER.fatal("getMultiMax() failed with NumberFormatException '{}'", e.getMessage());
 			System.exit(1);
@@ -103,7 +103,7 @@ public class CalculateBatchTypes {
 			LOGGER.fatal("getMultiMax() failed with NullPointerException '{}'", e.getMessage());
 			System.exit(1);
 		}
-		LOGGER.debug("getMultiMax() returned '{}'", result);
+		LOGGER.trace("getMultiMax() returned '{}'", result);
 		return result;
 	}
 
@@ -138,7 +138,7 @@ public class CalculateBatchTypes {
 		} else {
 			result = BatchTypes.UNSORTED;
 		}
-		LOGGER.debug("calculateBatchType({}) returned '{}'", prop, result);
+		LOGGER.trace("calculateBatchType({}) returned '{}'", prop, result);
 		return result;
 	}
 	
@@ -160,7 +160,7 @@ public class CalculateBatchTypes {
 		if("E".equalsIgnoreCase( prop.getDocDVLALanguage() )){
 			result = true;
 		}
-		LOGGER.debug("isEnglish({}) returned '{}'", prop, result);
+		LOGGER.trace("isEnglish({}) returned '{}'", prop, result);
 		return result;
 	}
 	
@@ -169,43 +169,43 @@ public class CalculateBatchTypes {
 		if("W".equalsIgnoreCase( prop.getDocDVLALanguage() )){
 			result = true;
 		}
-		LOGGER.debug("isWelsh({}) returned '{}'", prop, result);
+		LOGGER.trace("isWelsh({}) returned '{}'", prop, result);
 		return result;
 	}
 	
 	private boolean isClericalBatchRequired(DocumentProperty prop){
 		boolean result = false;
 		if( isEnglish(prop) ){
-			if( !("X".equalsIgnoreCase( (String) params.getProductionConfiguration().get("site.english.clerical") ) ) ){
+			if( !("X".equalsIgnoreCase( (String) params.getProperties().get("site.english.clerical") ) ) ){
 				result = true;
 			}
 		}else{
-			if( !("X".equalsIgnoreCase( (String) params.getProductionConfiguration().get("site.welsh.clerical") ) ) ){
+			if( !("X".equalsIgnoreCase( (String) params.getProperties().get("site.welsh.clerical") ) ) ){
 				result = true;
 			}
 		}
-		LOGGER.debug("isClericalBatchRequired({}) returned '{}'", prop, result);
+		LOGGER.trace("isClericalBatchRequired({}) returned '{}'", prop, result);
 		return result;
 	}
 	
 	private boolean isClerical(DocumentProperty prop){
 		boolean result = clericalCustomers.contains(prop);
-		LOGGER.debug("isClerical({}) returned '{}'", prop, result);
+		LOGGER.trace("isClerical({}) returned '{}'", prop, result);
 		return result;
 	}
 	
 	private boolean isFleetBatchRequired(DocumentProperty prop){
 		boolean result = false;
 		if( isEnglish(prop) ){
-			if( !("X".equalsIgnoreCase( (String) params.getProductionConfiguration().get("site.english.fleet") ) ) ){
+			if( !("X".equalsIgnoreCase( (String) params.getProperties().get("site.english.fleet") ) ) ){
 				result = true;
 			}
 		}else{
-			if( !("X".equalsIgnoreCase( (String) params.getProductionConfiguration().get("site.welsh.fleet") ) ) ){
+			if( !("X".equalsIgnoreCase( (String) params.getProperties().get("site.welsh.fleet") ) ) ){
 				result = true;
 			}
 		}
-		LOGGER.debug("isFleetBatchRequired({}) returned '{}'", prop, result);
+		LOGGER.trace("isFleetBatchRequired({}) returned '{}'", prop, result);
 		return result;
 	}
 	
@@ -214,22 +214,22 @@ public class CalculateBatchTypes {
 		if( prop.getDocDVLAFleetNo() == null || prop.getDocDVLAFleetNo().trim().isEmpty() ){
 			result = false;
 		}
-		LOGGER.debug("isFleet({}) returned '{}'",prop, result);
+		LOGGER.trace("isFleet({}) returned '{}'",prop, result);
 		return result;
 	}
 	
 	private boolean isUnsortedBatchRequired(DocumentProperty prop){
 		boolean result = false;
 		if( isEnglish(prop) ){
-			if( !("X".equalsIgnoreCase( (String) params.getProductionConfiguration().get("site.english.unsorted") ) ) ){
+			if( !("X".equalsIgnoreCase( (String) params.getProperties().get("site.english.unsorted") ) ) ){
 				result = true;
 			}
 		}else{
-			if( !("X".equalsIgnoreCase( (String) params.getProductionConfiguration().get("site.welsh.unsorted") ) ) ){
+			if( !("X".equalsIgnoreCase( (String) params.getProperties().get("site.welsh.unsorted") ) ) ){
 				result = true;
 			}
 		}
-		LOGGER.debug("isUnsortedBatchRequired({}) returned '{}'", prop, result);
+		LOGGER.trace("isUnsortedBatchRequired({}) returned '{}'", prop, result);
 		return result;
 	}
 	
@@ -238,45 +238,45 @@ public class CalculateBatchTypes {
 		if( prop.getDocDVLAMailsortCode() == null || prop.getDocDVLAMailsortCode().trim().isEmpty() ){
 			result = true;
 		}
-		LOGGER.debug("isUnsorted({}) returned '{}'", prop, result);
+		LOGGER.trace("isUnsorted({}) returned '{}'", prop, result);
 		return result;
 	}
 	
 	private boolean isSortedBatchRequired(DocumentProperty prop){
 		boolean result = false;
 		if( isEnglish(prop) ){
-			if( !("X".equalsIgnoreCase( (String) params.getProductionConfiguration().get("site.english.sorted") ) ) ){
+			if( !("X".equalsIgnoreCase( (String) params.getProperties().get("site.english.sorted") ) ) ){
 				result = true;
 			}
 		}else{
-			if( !("X".equalsIgnoreCase( (String) params.getProductionConfiguration().get("site.welsh.sorted") ) ) ){
+			if( !("X".equalsIgnoreCase( (String) params.getProperties().get("site.welsh.sorted") ) ) ){
 				result = true;
 			}
 		}
-		LOGGER.debug("isSortedBatchRequired({}) returned '{}'", prop, result);
+		LOGGER.trace("isSortedBatchRequired({}) returned '{}'", prop, result);
 		return result;
 	}
 	
 	private boolean isMultiBatchRequired(DocumentProperty prop){
 		boolean result = false;
 		if( isEnglish(prop) ){
-			if(  !((String) params.getProductionConfiguration().get("site.english.multi")).contains("X") && 
-					!((String) params.getProductionConfiguration().get("site.english.multi")).contains("x")){
+			if(  !((String) params.getProperties().get("site.english.multi")).contains("X") && 
+					!((String) params.getProperties().get("site.english.multi")).contains("x")){
 				result = true;
 			}
 		}else{
-			if( !((String) params.getProductionConfiguration().get("site.welsh.multi")).contains("X") && 
-					!((String) params.getProductionConfiguration().get("site.welsh.multi")).contains("x")){
+			if( !((String) params.getProperties().get("site.welsh.multi")).contains("X") && 
+					!((String) params.getProperties().get("site.welsh.multi")).contains("x")){
 				result = true;
 			}
 		}
-		LOGGER.debug("isMultiBatchRequired({}) returned '{}'", prop, result);
+		LOGGER.trace("isMultiBatchRequired({}) returned '{}'", prop, result);
 		return result;
 	}
 	
 	private boolean isMulti(DocumentProperty prop){
 		boolean result = multiCustomers.contains(prop);
-		LOGGER.debug("isMulti({}) returned '{}'", prop, result);
+		LOGGER.trace("isMulti({}) returned '{}'", prop, result);
 		return result;
 	}
 	
@@ -284,45 +284,45 @@ public class CalculateBatchTypes {
 	private boolean isSortingBatchRequired(DocumentProperty prop){
 		boolean result = false;
 		if( isEnglish(prop) ){
-			if( !("X".equalsIgnoreCase( (String) params.getProductionConfiguration().get("site.english.sorting") ) ) ){
+			if( !("X".equalsIgnoreCase( (String) params.getProperties().get("site.english.sorting") ) ) ){
 				result = true;
 			}
 		}else{
-			if( !("X".equalsIgnoreCase( (String) params.getProductionConfiguration().get("site.welsh.sorting") ) ) ){
+			if( !("X".equalsIgnoreCase( (String) params.getProperties().get("site.welsh.sorting") ) ) ){
 				result = true;
 			}
 		}
-		LOGGER.debug("isSortingBatchRequired({}) returned '{}'", prop, result);
+		LOGGER.trace("isSortingBatchRequired({}) returned '{}'", prop, result);
 		return result;
 	}
 	
 	private boolean isRejectBatchRequired(DocumentProperty prop){
 		boolean result = false;
 		if( isEnglish(prop) ){
-			if( !("X".equalsIgnoreCase( (String) params.getProductionConfiguration().get("site.english.reject") ) ) ){
+			if( !("X".equalsIgnoreCase( (String) params.getProperties().get("site.english.reject") ) ) ){
 				result = true;
 			}
 		}else{
-			if( !("X".equalsIgnoreCase( (String) params.getProductionConfiguration().get("site.welsh.reject") ) ) ){
+			if( !("X".equalsIgnoreCase( (String) params.getProperties().get("site.welsh.reject") ) ) ){
 				result = true;
 			}
 		}
-		LOGGER.debug("isRejectBatchRequired({}) returned '{}'", prop, result);
+		LOGGER.trace("isRejectBatchRequired({}) returned '{}'", prop, result);
 		return result;
 	}
 	
 	private boolean isReprintBatchRequired(DocumentProperty prop){
 		boolean result = false;
 		if( isEnglish(prop) ){
-			if( !("X".equalsIgnoreCase( (String) params.getProductionConfiguration().get("site.english.reprint") ) ) ){
+			if( !("X".equalsIgnoreCase( (String) params.getProperties().get("site.english.reprint") ) ) ){
 				result = true;
 			}
 		}else{
-			if( !("X".equalsIgnoreCase( (String) params.getProductionConfiguration().get("site.welsh.reprint") ) ) ){
+			if( !("X".equalsIgnoreCase( (String) params.getProperties().get("site.welsh.reprint") ) ) ){
 				result = true;
 			}
 		}
-		LOGGER.debug("isReprintBatchRequired({}) returned '{}'", prop, result);
+		LOGGER.trace("isReprintBatchRequired({}) returned '{}'", prop, result);
 		return result;
 	}
 	
@@ -332,13 +332,13 @@ public class CalculateBatchTypes {
 			if( BatchTypes.valueOf(prop.getDocDVLABatchType()).equals(BatchTypes.FLEET) ){
 				prop.setDocDVLAGroupId("" + fleetMap.get(prop));
 			}else if( BatchTypes.valueOf(prop.getDocDVLABatchType()).equals(BatchTypes.CLERICAL) ){
-				prop.setDocDVLABatchType("" + multiMap.get(prop));
+				prop.setDocDVLAGroupId("" + multiMap.get(prop));
 			}else if( BatchTypes.valueOf(prop.getDocDVLABatchType()).equals(BatchTypes.MULTI) ){
-				prop.setDocDVLABatchType("" + multiMap.get(prop));
-			}else if( isEnglish(prop) && "X".equalsIgnoreCase((String) params.getProductionConfiguration().get("site.english.multi")) ){
-				prop.setDocDVLABatchType("" + multiMap.get(prop));
-			}else if( isWelsh(prop) && "X".equalsIgnoreCase((String) params.getProductionConfiguration().get("site.welsh.multi")) ){
-				prop.setDocDVLABatchType("" + multiMap.get(prop));
+				prop.setDocDVLAGroupId("" + multiMap.get(prop));
+			}else if( isEnglish(prop) && "X".equalsIgnoreCase((String) params.getProperties().get("site.english.multi")) ){
+				prop.setDocDVLAGroupId("" + multiMap.get(prop));
+			}else if( isWelsh(prop) && "X".equalsIgnoreCase((String) params.getProperties().get("site.welsh.multi")) ){
+				prop.setDocDVLAGroupId("" + multiMap.get(prop));
 			}
 		}
 	}

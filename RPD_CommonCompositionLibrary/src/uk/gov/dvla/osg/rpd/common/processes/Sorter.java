@@ -1,10 +1,11 @@
-package uk.gov.dvla.osg.rpd.main;
+package uk.gov.dvla.osg.rpd.common.processes;
 
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
 import uk.gov.dvla.osg.rpd.abstractions.SessionParameterInterface;
+import uk.gov.dvla.osg.rpd.document.properties.DocumentProperty;
 
 public class Sorter {
 
@@ -14,7 +15,7 @@ public class Sorter {
 		this.params = params;
 	}
 	
-	public void sort(Comparator comparator){
+	public void sort(Comparator<DocumentProperty> comparator){
 		Collections.sort( params.getDocumentProperties(), comparator);
 	}
 }
