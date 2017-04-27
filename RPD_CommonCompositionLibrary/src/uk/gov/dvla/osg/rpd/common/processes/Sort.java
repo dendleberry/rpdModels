@@ -7,11 +7,11 @@ import java.util.List;
 import uk.gov.dvla.osg.rpd.abstractions.SessionParameterInterface;
 import uk.gov.dvla.osg.rpd.document.properties.DocumentProperty;
 
-public class Sorter {
+public class Sort {
 
 	SessionParameterInterface params;
 	
-	public Sorter(SessionParameterInterface params){
+	public Sort(SessionParameterInterface params){
 		this.params = params;
 	}
 	

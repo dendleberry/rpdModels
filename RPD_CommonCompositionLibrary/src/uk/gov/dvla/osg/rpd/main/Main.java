@@ -20,7 +20,7 @@ import org.apache.logging.log4j.Logger;
 import uk.gov.dvla.osg.rpd.abstractions.SessionParameterInterface;
 import uk.gov.dvla.osg.rpd.common.models.SelectorLookup;
 import uk.gov.dvla.osg.rpd.common.processes.CalculateBatchTypes;
-import uk.gov.dvla.osg.rpd.common.processes.Sorter;
+import uk.gov.dvla.osg.rpd.common.processes.Sort;
 import uk.gov.dvla.osg.rpd.document.properties.DocumentProperty;
 
 import com.google.inject.Guice;
@@ -34,7 +34,7 @@ public class Main {
 	private static String inputFilePath, outputFilePath, propsFilePath, parentJobId, runNo;
 	private static SelectorLookup selectorLookup;
 	private static SessionParameterInterface params;
-	private static Sorter sorter;
+	private static Sort sorter;
 	
 	public static void main(String[] args) {
 		
