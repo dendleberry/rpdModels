@@ -1,7 +1,6 @@
 package uk.gov.dvla.osg.rpd.main;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -18,10 +17,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import uk.gov.dvla.osg.rpd.abstractions.SessionParameterInterface;
+import uk.gov.dvla.osg.rpd.common.models.Document;
 import uk.gov.dvla.osg.rpd.common.models.SelectorLookup;
 import uk.gov.dvla.osg.rpd.common.processes.CalculateBatchTypes;
+import uk.gov.dvla.osg.rpd.common.processes.CreateDocuments;
+import uk.gov.dvla.osg.rpd.common.processes.CreateGroups;
 import uk.gov.dvla.osg.rpd.common.processes.Sort;
 import uk.gov.dvla.osg.rpd.document.properties.DocumentProperty;
+import uk.gov.dvla.osg.rpd.sorts.SortByPresentationPriority;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -30,6 +33,7 @@ public class Main {
 	private static final Logger LOGGER = LogManager.getLogger();
 	private static final int EXPECTED_NO_OF_ARGS = 5;
 	private static ArrayList<DocumentProperty> docProps;
+	private static ArrayList<Document> docs;
 	private static Properties applicationProperties;
 	private static String inputFilePath, outputFilePath, propsFilePath, parentJobId, runNo;
 	private static SelectorLookup selectorLookup;
@@ -37,23 +41,25 @@ public class Main {
 	private static Sort sorter;
 	
 	public static void main(String[] args) {
-		
+		LOGGER.info("Starting main..");
 		assignArgs(args);
 		validateArgs(args);
 		docProps = DocumentProperty.getDocumentPropertiesFromTabDelimittedFile(inputFilePath);
 		applicationProperties = getPropertiesFromPropertiesFile(propsFilePath);
 		selectorLookup = loadSelectorLookup();
 		params = getParameters();
-		//sorter = new Sorter(params);
+		sorter = new Sort(params);
 		
-		new CalculateBatchTypes(params).calculateBatchTypes();
+		new CalculateBatchTypes(docProps, params).calculateBatchTypes();
+		docs = new CreateDocuments(docProps, params).createDocs();
+		sorter.sort(docs, new SortByPresentationPriority());
+		//new CreateGroups(params);
+		
 		
 		writeDpf();
-		
+		LOGGER.info("Finished main..");
 	}
 	
-
-
 	private static void validateArgs(String[] args) {
 		if( args.length != EXPECTED_NO_OF_ARGS ){
 			LOGGER.fatal("Incorrect number of arguments parsed. Expected {}, recieved {}", EXPECTED_NO_OF_ARGS, args.length);
@@ -134,7 +140,6 @@ public class Main {
 		String productionConfigurationPath = getProductionConfigPath(applicationProperties, selectorLookup);
 		String postageConfigurationPath = getPostageConfigPath(applicationProperties, selectorLookup);
 		String presentationPriorityPath = getPresPriorityConfigPath(applicationProperties, selectorLookup);
-		params.setDocumentProperties(docProps);
 		params.addProperties(getPropertiesFromPropertiesFile(productionConfigurationPath));
 		params.addProperties(getPropertiesFromPropertiesFile(postageConfigurationPath));
 		params.addProperties(getPropertiesFromPropertiesFile(propsFilePath));
@@ -177,6 +182,8 @@ public class Main {
 		try{
 			while( (readLine = reader.readLine() ) != null ) {
 				results.put(readLine, i);
+				LOGGER.debug("Adding '{}' to Map as priority {}", readLine, i);
+				i ++;
 			}
 		} catch (NullPointerException e){
 			e.printStackTrace();
@@ -224,8 +231,8 @@ public class Main {
 		LOGGER.debug("writeDpf() running..");
 		PrintWriter w = DocumentProperty.setupWriter(params.getOutputFilePath());
 		w.println(DocumentProperty.getHeaderRecordAsString(inputFilePath));
-		for( DocumentProperty dp : params.getDocumentProperties() ){
-			w.println(dp);
+		for( Document doc : docs ){
+			w.println(doc.getDocProp());
 		}
 		DocumentProperty.closeWriter(w);
 	}

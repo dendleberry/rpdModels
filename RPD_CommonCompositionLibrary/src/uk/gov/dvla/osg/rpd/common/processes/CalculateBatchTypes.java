@@ -1,5 +1,6 @@
 package uk.gov.dvla.osg.rpd.common.processes;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -18,16 +19,18 @@ public class CalculateBatchTypes {
 	private SessionParameterInterface params;
 	private Set<DocumentProperty> uniqueNonFleetCustomers, uniqueFleetCustomers, multiCustomers, clericalCustomers;
 	private Map<DocumentProperty,Integer> multiMap, fleetMap;
+	private static ArrayList<DocumentProperty> docProps;
 	private int groupCounter;
 	
 	
-	public CalculateBatchTypes(SessionParameterInterface params){
-		LOGGER.debug("CalculateBatchTypes constructed with {}", params);
+	public CalculateBatchTypes(ArrayList<DocumentProperty> docProps, SessionParameterInterface params){
+		this.docProps=docProps;
 		this.params=params;
 		groupCounter = 1;
 	}
 	
 	public void calculateBatchTypes(){
+		LOGGER.debug("calculateBatchTypes() running..");
 		initSets();
 		initMaps();
 		findUniqueCustomers();
@@ -52,7 +55,7 @@ public class CalculateBatchTypes {
 	}
 	private void findUniqueCustomers() {
 		LOGGER.debug("findUniqueCustomers() running..");
-		for( DocumentProperty prop : params.getDocumentProperties() ){
+		for( DocumentProperty prop : docProps ){
 			if( isFleet(prop) ){
 				uniqueFleetCustomers.add(prop);
 			}else{
@@ -84,7 +87,7 @@ public class CalculateBatchTypes {
 		int occurrences = 0;
 		for(DocumentProperty prop : multiCustomers){
 			if( isClericalBatchRequired(prop) ){
-				occurrences = Collections.frequency(params.getDocumentProperties(), prop);
+				occurrences = Collections.frequency(docProps, prop);
 				if(occurrences > getMultiMax() ){
 					clericalCustomers.add(prop);
 				}
@@ -109,7 +112,7 @@ public class CalculateBatchTypes {
 
 	private void assignBatchTypes() {
 		LOGGER.debug("assignBatchTypes() running..");
-		for( DocumentProperty prop : params.getDocumentProperties() ){
+		for( DocumentProperty prop : docProps ){
 			if( prop.getDocDVLAOriginalBatchType() == null || prop.getDocDVLAOriginalBatchType().isEmpty() ){
 				prop.setDocDVLABatchType(calculateBatchType(prop).toString());
 			}else{
@@ -328,7 +331,7 @@ public class CalculateBatchTypes {
 	
 	private void assignGroupIds() {
 		LOGGER.debug("assignGroupIds() running..");
-		for( DocumentProperty prop : params.getDocumentProperties() ){
+		for( DocumentProperty prop : docProps ){
 			if( BatchTypes.valueOf(prop.getDocDVLABatchType()).equals(BatchTypes.FLEET) ){
 				prop.setDocDVLAGroupId("" + fleetMap.get(prop));
 			}else if( BatchTypes.valueOf(prop.getDocDVLABatchType()).equals(BatchTypes.CLERICAL) ){

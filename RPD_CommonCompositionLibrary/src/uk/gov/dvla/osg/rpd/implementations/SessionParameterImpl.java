@@ -11,7 +11,7 @@ public class SessionParameterImpl implements SessionParameterInterface {
 	private List<DocumentProperty> docProps;
 	private Map<String, Integer> presentationPriority;
 	Properties props;
-	private String runNo, jobId, outputFilePath, postagePath, productionPath, applicationPath, presPath;
+	private String runNo, jobId, outputFilePath, presPath;
 	
 	@Override
 	public void addProperties(Properties prop) {
@@ -21,10 +21,6 @@ public class SessionParameterImpl implements SessionParameterInterface {
 		}else{
 			props.putAll(prop);
 		}
-	}
-	@Override
-	public void setDocumentProperties(List<DocumentProperty> docProps) {
-		this.docProps=docProps;
 	}
 	@Override
 	public void setPresentationPriority(Map<String, Integer> presentationPriority) {
@@ -42,11 +38,6 @@ public class SessionParameterImpl implements SessionParameterInterface {
 	public void setJobId(String jobId) {
 		this.jobId=jobId;
 	}
-	@Override
-	public List<DocumentProperty> getDocumentProperties() {
-		return docProps;
-	}
-
 	@Override
 	public Map<String, Integer> getPresentationPriority() {
 		return presentationPriority;
@@ -67,7 +58,6 @@ public class SessionParameterImpl implements SessionParameterInterface {
 	public Properties getProperties() {
 		return props;
 	}
-
 	@Override
 	public String toString(){
 		return "number of docProps:" + docProps.size() +
