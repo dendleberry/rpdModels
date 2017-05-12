@@ -16,6 +16,7 @@ import java.util.Properties;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import uk.gov.dvla.osg.rpd.abstractions.AbstractGroup;
 import uk.gov.dvla.osg.rpd.abstractions.SessionParameterInterface;
 import uk.gov.dvla.osg.rpd.common.models.Document;
 import uk.gov.dvla.osg.rpd.common.models.SelectorLookup;
@@ -34,6 +35,7 @@ public class Main {
 	private static final int EXPECTED_NO_OF_ARGS = 5;
 	private static ArrayList<DocumentProperty> docProps;
 	private static ArrayList<Document> docs;
+	private static ArrayList<AbstractGroup> groups;
 	private static Properties applicationProperties;
 	private static String inputFilePath, outputFilePath, propsFilePath, parentJobId, runNo;
 	private static SelectorLookup selectorLookup;
@@ -52,9 +54,9 @@ public class Main {
 		
 		new CalculateBatchTypes(docProps, params).calculateBatchTypes();
 		docs = new CreateDocuments(docProps, params).createDocs();
-		sorter.sort(docs, new SortByPresentationPriority());
-		//new CreateGroups(params);
 		
+		//groups = new CreateGroups(params).createGroupsFromDocs(docs);
+		sorter.sort(docs, new SortByPresentationPriority());
 		
 		writeDpf();
 		LOGGER.info("Finished main..");
@@ -232,7 +234,7 @@ public class Main {
 		PrintWriter w = DocumentProperty.setupWriter(params.getOutputFilePath());
 		w.println(DocumentProperty.getHeaderRecordAsString(inputFilePath));
 		for( Document doc : docs ){
-			w.println(doc.getDocProp());
+			w.println(doc);
 		}
 		DocumentProperty.closeWriter(w);
 	}

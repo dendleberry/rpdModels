@@ -11,6 +11,7 @@ public class SortByPresentationPriority implements Comparator<Document>{
 		/* SORT ORDER IS:
 		 * PRESENTATION_ORDER
 		 * LANGUAGE
+		 * GROUP_ID
 		 */
 		
 		// Next by PRESENTATION_ORDER - stop if this gives a result.
@@ -18,8 +19,13 @@ public class SortByPresentationPriority implements Comparator<Document>{
         if (presResult != 0){
             return presResult;
         }
-        return o1.getDocProp().getDocDVLALanguage().compareTo(o2.getDocProp().getDocDVLALanguage());
-
+        
+        int langResult = o1.getLanguage().compareTo(o2.getLanguage());
+        if (langResult != 0){
+            return langResult;
+        }
+        
+        return o1.getGroupId().compareTo(o2.getGroupId());
 	}
 
 }

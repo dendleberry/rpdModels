@@ -20,7 +20,7 @@ public class Sort {
 		this.params = params;
 	}
 	
-	public void sort(ArrayList<Document> docs, Comparator<Document> comparator){
+	public static void sort(ArrayList<Document> docs, Comparator<Document> comparator){
 		LOGGER.debug("sort running");
 		Collections.sort( docs, comparator);
 	}

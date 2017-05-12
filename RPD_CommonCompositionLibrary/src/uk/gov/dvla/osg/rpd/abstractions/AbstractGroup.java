@@ -7,6 +7,7 @@ import uk.gov.dvla.osg.rpd.document.properties.DocumentProperty;
 
 public abstract class AbstractGroup {
 	private int pagesInGroup;
+	private String groupId;
 	private ArrayList<Document> docs;
 	
 	public abstract void batch();
@@ -19,13 +20,19 @@ public abstract class AbstractGroup {
 		return pagesInGroup;
 	}
 	
-	public void addDocProp(Document doc){
+	public void addDocument(Document doc){
 		docs.add(doc);
-		pagesInGroup += Integer.parseInt(doc.getDocProp().getDocOriginalSheets());
+		pagesInGroup += doc.getNoOfSheets();
 	}
 	
-	public ArrayList<Document> getDocumentProperties(){
+	public ArrayList<Document> getDocuments(){
 		return docs;
+	}
+	public void setGroupId(String groupId){
+		this.groupId=groupId;
+	}
+	public String getGroupId(){
+		return groupId;
 	}
 	
 }
