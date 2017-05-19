@@ -10,14 +10,19 @@ public class SortByPresentationPriority implements Comparator<Document>{
 	public int compare(Document o1, Document o2) {
 		/* SORT ORDER IS:
 		 * PRESENTATION_ORDER
+		 * SUB_BATCH_TYPE
 		 * LANGUAGE
 		 * GROUP_ID
 		 */
 		
-		// Next by PRESENTATION_ORDER - stop if this gives a result.
         int presResult = o1.getPresentationOrder().compareTo(o2.getPresentationOrder());
         if (presResult != 0){
             return presResult;
+        }
+        
+        int subBatchResult = o1.getSubBatchType().compareTo(o2.getSubBatchType());
+        if (subBatchResult != 0){
+            return subBatchResult;
         }
         
         int langResult = o1.getLanguage().compareTo(o2.getLanguage());

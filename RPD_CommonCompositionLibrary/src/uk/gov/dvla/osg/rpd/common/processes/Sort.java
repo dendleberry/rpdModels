@@ -14,16 +14,10 @@ import uk.gov.dvla.osg.rpd.sorts.SortByPresentationPriority;
 
 public class Sort {
 	private static final Logger LOGGER = LogManager.getLogger();
-	SessionParameterInterface params;
-	
-	public Sort(SessionParameterInterface params){
-		this.params = params;
-	}
-	
+
 	public static void sort(ArrayList<Document> docs, Comparator<Document> comparator){
 		LOGGER.debug("sort running");
 		Collections.sort( docs, comparator);
 	}
-
 
 }

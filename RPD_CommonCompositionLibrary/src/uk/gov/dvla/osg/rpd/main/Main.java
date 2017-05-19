@@ -10,19 +10,21 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import uk.gov.dvla.osg.rpd.abstractions.AbstractGroup;
+import uk.gov.dvla.osg.rpd.abstractions.AbstractBatch;
 import uk.gov.dvla.osg.rpd.abstractions.SessionParameterInterface;
+import uk.gov.dvla.osg.rpd.common.models.BatchTypes;
 import uk.gov.dvla.osg.rpd.common.models.Document;
 import uk.gov.dvla.osg.rpd.common.models.SelectorLookup;
 import uk.gov.dvla.osg.rpd.common.processes.CalculateBatchTypes;
 import uk.gov.dvla.osg.rpd.common.processes.CreateDocuments;
-import uk.gov.dvla.osg.rpd.common.processes.CreateGroups;
+import uk.gov.dvla.osg.rpd.common.processes.BatchEngine;
 import uk.gov.dvla.osg.rpd.common.processes.Sort;
 import uk.gov.dvla.osg.rpd.document.properties.DocumentProperty;
 import uk.gov.dvla.osg.rpd.sorts.SortByPresentationPriority;
@@ -35,7 +37,7 @@ public class Main {
 	private static final int EXPECTED_NO_OF_ARGS = 5;
 	private static ArrayList<DocumentProperty> docProps;
 	private static ArrayList<Document> docs;
-	private static ArrayList<AbstractGroup> groups;
+	private static ArrayList<AbstractBatch> groups;
 	private static Properties applicationProperties;
 	private static String inputFilePath, outputFilePath, propsFilePath, parentJobId, runNo;
 	private static SelectorLookup selectorLookup;
@@ -46,17 +48,17 @@ public class Main {
 		LOGGER.info("Starting main..");
 		assignArgs(args);
 		validateArgs(args);
-		docProps = DocumentProperty.getDocumentPropertiesFromTabDelimittedFile(inputFilePath);
 		applicationProperties = getPropertiesFromPropertiesFile(propsFilePath);
+		docProps = DocumentProperty.getDocumentPropertiesFromTabDelimittedFile(inputFilePath);
 		selectorLookup = loadSelectorLookup();
 		params = getParameters();
-		sorter = new Sort(params);
+		docs = CreateDocuments.createDocs(docProps);
+		new CalculateBatchTypes(docs, params).calculateBatchTypes();
+		Sort.sort(docs, new SortByPresentationPriority());
 		
-		new CalculateBatchTypes(docProps, params).calculateBatchTypes();
-		docs = new CreateDocuments(docProps, params).createDocs();
 		
 		//groups = new CreateGroups(params).createGroupsFromDocs(docs);
-		sorter.sort(docs, new SortByPresentationPriority());
+		
 		
 		writeDpf();
 		LOGGER.info("Finished main..");
@@ -75,6 +77,7 @@ public class Main {
 			LOGGER.fatal("File '{}' doesn't exist",propsFilePath);
 			System.exit(1);
 		}
+		LOGGER.info("validateArgs passed");
 	}
 	
 	private static boolean fileExists(String fileToCheck) {
@@ -158,7 +161,7 @@ public class Main {
 		LOGGER.debug("getProductionConfigPath returned '{}'",result);
 		return result;
 	}
-
+	
 	private static String getPostageConfigPath(Properties applicationProperties, SelectorLookup selectorLookup) {
 		String result = applicationProperties.getProperty("postageConfigPath") + 
 				selectorLookup.getPostageConfig() + 
@@ -176,7 +179,6 @@ public class Main {
 	}
 
 	private static Map<String,Integer> getPresentationPriorityMap(String filePath){
-		LOGGER.debug("getPresentationPriorityMap() running..");
 		Map<String, Integer> results = new HashMap<String, Integer>();
 		BufferedReader reader = setupReader(filePath);
 		String readLine ="";
@@ -209,6 +211,7 @@ public class Main {
 			LOGGER.fatal("FileNotFoundException '{}' when procesing file '{}'.", e.getMessage(), input);
 			System.exit(1);
 		}
+        LOGGER.debug("setupReader(String {}) returned '{}'", input, result);
 		return result;
 	}
 	
@@ -238,4 +241,17 @@ public class Main {
 		}
 		DocumentProperty.closeWriter(w);
 	}
+	public static Integer getPresentationPriority(Document doc){
+		String lookup = "";
+		int result = 0;
+		if( doc.getSubBatchType() == null || doc.getSubBatchType().trim().isEmpty() ){
+			lookup = doc.getBatchType().toString();
+		}else{
+			lookup = doc.getBatchType().toString() + "_" + doc.getSubBatchType();
+		}
+		result =  params.getPresentationPriority().get(lookup);
+		LOGGER.trace("getPresentationPriority(Document {}) returned'{}'", doc, result );
+		return result;
+	}
+	
 }

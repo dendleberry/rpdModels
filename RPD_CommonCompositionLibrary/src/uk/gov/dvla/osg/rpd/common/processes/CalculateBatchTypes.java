@@ -12,19 +12,20 @@ import org.apache.logging.log4j.Logger;
 
 import uk.gov.dvla.osg.rpd.abstractions.SessionParameterInterface;
 import uk.gov.dvla.osg.rpd.common.models.BatchTypes;
+import uk.gov.dvla.osg.rpd.common.models.Document;
 import uk.gov.dvla.osg.rpd.document.properties.DocumentProperty;
 
 public class CalculateBatchTypes {
 	private static final Logger LOGGER = LogManager.getLogger();
 	private SessionParameterInterface params;
-	private Set<DocumentProperty> uniqueNonFleetCustomers, uniqueFleetCustomers, multiCustomers, clericalCustomers;
-	private Map<DocumentProperty,Integer> multiMap, fleetMap;
-	private static ArrayList<DocumentProperty> docProps;
+	private Set<Document> uniqueNonFleetCustomers, uniqueFleetCustomers, multiCustomers, clericalCustomers;
+	private Map<Document,Integer> multiMap, fleetMap;
+	private static ArrayList<Document> docs;
 	private int groupCounter;
 	
 	
-	public CalculateBatchTypes(ArrayList<DocumentProperty> docProps, SessionParameterInterface params){
-		this.docProps=docProps;
+	public CalculateBatchTypes(ArrayList<Document> docs, SessionParameterInterface params){
+		this.docs=docs;
 		this.params=params;
 		groupCounter = 1;
 	}
@@ -43,24 +44,24 @@ public class CalculateBatchTypes {
 
 	private void initSets() {
 		LOGGER.debug("initSets() running..");
-		uniqueNonFleetCustomers = new HashSet<DocumentProperty>();
-		uniqueFleetCustomers = new HashSet<DocumentProperty>();
-		multiCustomers = new HashSet<DocumentProperty>();
-		clericalCustomers = new HashSet<DocumentProperty>();
+		uniqueNonFleetCustomers = new HashSet<Document>();
+		uniqueFleetCustomers = new HashSet<Document>();
+		multiCustomers = new HashSet<Document>();
+		clericalCustomers = new HashSet<Document>();
 	}
 	private void initMaps() {
 		LOGGER.debug("initMaps() running..");
-		multiMap = new HashMap<DocumentProperty,Integer>();
-		fleetMap = new HashMap<DocumentProperty,Integer>();
+		multiMap = new HashMap<Document,Integer>();
+		fleetMap = new HashMap<Document,Integer>();
 	}
 	private void findUniqueCustomers() {
 		LOGGER.debug("findUniqueCustomers() running..");
-		for( DocumentProperty prop : docProps ){
-			if( isFleet(prop) ){
-				uniqueFleetCustomers.add(prop);
+		for( Document doc : docs ){
+			if( doc.isFleet() ){
+				uniqueFleetCustomers.add(doc);
 			}else{
-				if( !(uniqueNonFleetCustomers.add(prop)) ){
-					multiCustomers.add(prop);
+				if( !(uniqueNonFleetCustomers.add(doc)) ){
+					multiCustomers.add(doc);
 				}
 			}
 		}
@@ -68,7 +69,7 @@ public class CalculateBatchTypes {
 	
 	private void createMapOfFleetCustomers() {
 		LOGGER.debug("createMapOfFleetCustomers() running..");
-		for(DocumentProperty fleet : uniqueFleetCustomers){
+		for(Document fleet : uniqueFleetCustomers){
 			fleetMap.put(fleet, groupCounter);
 			groupCounter ++;
 		}
@@ -76,8 +77,8 @@ public class CalculateBatchTypes {
 	
 	private void createMapOfMultiCustomers() {
 		LOGGER.debug("createMapOfMultiCustomers() running..");
-		for(DocumentProperty prop : multiCustomers){
-			multiMap.put(prop, groupCounter);
+		for(Document multi : multiCustomers){
+			multiMap.put(multi, groupCounter);
 			groupCounter ++;
 		}
 	}
@@ -85,9 +86,9 @@ public class CalculateBatchTypes {
 	private void calculateClericalCustomers() {
 		LOGGER.debug("calculateClericalCustomers() running..");
 		int occurrences = 0;
-		for(DocumentProperty prop : multiCustomers){
+		for(Document prop : multiCustomers){
 			if( isClericalBatchRequired(prop) ){
-				occurrences = Collections.frequency(docProps, prop);
+				occurrences = Collections.frequency(docs, prop);
 				if(occurrences > getMultiMax() ){
 					clericalCustomers.add(prop);
 				}
@@ -112,42 +113,42 @@ public class CalculateBatchTypes {
 
 	private void assignBatchTypes() {
 		LOGGER.debug("assignBatchTypes() running..");
-		for( DocumentProperty prop : docProps ){
-			if( prop.getDocDVLAOriginalBatchType() == null || prop.getDocDVLAOriginalBatchType().isEmpty() ){
-				prop.setDocDVLABatchType(calculateBatchType(prop).toString());
+		for( Document doc : docs ){
+			if( doc.getOriginalBatchType() == null ){
+				doc.setBatchType(calculateBatchType(doc));
 			}else{
-				if( contains(prop.getDocDVLAOriginalBatchType()) ){
-					prop.setDocDVLABatchType(prop.getDocDVLAOriginalBatchType());
+				if( contains(doc.getOriginalBatchType()) ){
+					doc.setBatchType(doc.getOriginalBatchType());
 				}else{
-					LOGGER.fatal("Unknown batch type ({}) set for customer with doc ref '{}'", prop.getDocDVLAOriginalBatchType(), prop.getDocID());
+					LOGGER.fatal("Unknown batch type ({}) set for customer with doc ref '{}'", doc.getOriginalBatchType(), doc.getDocID());
 					System.exit(1);
 				}
 			}
 		}
 	}
 
-	private BatchTypes calculateBatchType(DocumentProperty prop) {
+	private BatchTypes calculateBatchType(Document doc) {
 		BatchTypes result = BatchTypes.REJECT;
-		if( isFleetBatchRequired(prop) && isFleet(prop) ){
+		if( isFleetBatchRequired(doc) && doc.isFleet() ){
 			result = BatchTypes.FLEET;
-		} else if ( isUnsortedBatchRequired(prop) && isUnsorted(prop) ){
+		} else if ( isUnsortedBatchRequired(doc) && doc.isUnsorted() ){
 			result = BatchTypes.UNSORTED;
-		} else if ( isClericalBatchRequired(prop) && isClerical(prop) ){
+		} else if ( isClericalBatchRequired(doc) && isClerical(doc) ){
 			result = BatchTypes.CLERICAL;
-		} else if ( isMultiBatchRequired(prop) && isMulti(prop) ){
+		} else if ( isMultiBatchRequired(doc) && isMulti(doc) ){
 			result = BatchTypes.MULTI;
-		} else if ( isSortedBatchRequired(prop) ){
+		} else if ( isSortedBatchRequired(doc) ){
 			result = BatchTypes.SORTED;
 		} else {
 			result = BatchTypes.UNSORTED;
 		}
-		LOGGER.trace("calculateBatchType({}) returned '{}'", prop, result);
+		LOGGER.trace("calculateBatchType({}) returned '{}'", doc, result);
 		return result;
 	}
 	
 
 
-	private boolean contains(String test) {
+	private boolean contains(BatchTypes test) {
 		boolean result = false;
 	    for (BatchTypes type : BatchTypes.values()) {
 	        if (type.name().equals(test)) {
@@ -157,28 +158,10 @@ public class CalculateBatchTypes {
 	    LOGGER.debug("contains({}) returned '{}'", test, result);
 	    return result;
 	}
-
-	private boolean isEnglish(DocumentProperty prop){
-		boolean result = false;
-		if("E".equalsIgnoreCase( prop.getDocDVLALanguage() )){
-			result = true;
-		}
-		LOGGER.trace("isEnglish({}) returned '{}'", prop, result);
-		return result;
-	}
 	
-	private boolean isWelsh(DocumentProperty prop){
+	private boolean isClericalBatchRequired(Document doc){
 		boolean result = false;
-		if("W".equalsIgnoreCase( prop.getDocDVLALanguage() )){
-			result = true;
-		}
-		LOGGER.trace("isWelsh({}) returned '{}'", prop, result);
-		return result;
-	}
-	
-	private boolean isClericalBatchRequired(DocumentProperty prop){
-		boolean result = false;
-		if( isEnglish(prop) ){
+		if( doc.isEnglish() ){
 			if( !("X".equalsIgnoreCase( (String) params.getProperties().get("site.english.clerical") ) ) ){
 				result = true;
 			}
@@ -187,19 +170,19 @@ public class CalculateBatchTypes {
 				result = true;
 			}
 		}
-		LOGGER.trace("isClericalBatchRequired({}) returned '{}'", prop, result);
+		LOGGER.trace("isClericalBatchRequired({}) returned '{}'", doc, result);
 		return result;
 	}
 	
-	private boolean isClerical(DocumentProperty prop){
-		boolean result = clericalCustomers.contains(prop);
-		LOGGER.trace("isClerical({}) returned '{}'", prop, result);
+	private boolean isClerical(Document doc){
+		boolean result = clericalCustomers.contains(doc);
+		LOGGER.trace("isClerical({}) returned '{}'", doc, result);
 		return result;
 	}
 	
-	private boolean isFleetBatchRequired(DocumentProperty prop){
+	private boolean isFleetBatchRequired(Document doc){
 		boolean result = false;
-		if( isEnglish(prop) ){
+		if( doc.isEnglish() ){
 			if( !("X".equalsIgnoreCase( (String) params.getProperties().get("site.english.fleet") ) ) ){
 				result = true;
 			}
@@ -208,22 +191,14 @@ public class CalculateBatchTypes {
 				result = true;
 			}
 		}
-		LOGGER.trace("isFleetBatchRequired({}) returned '{}'", prop, result);
+		LOGGER.trace("isFleetBatchRequired({}) returned '{}'", doc, result);
 		return result;
 	}
 	
-	private boolean isFleet(DocumentProperty prop) {
-		boolean result = true;
-		if( prop.getDocDVLAFleetNo() == null || prop.getDocDVLAFleetNo().trim().isEmpty() ){
-			result = false;
-		}
-		LOGGER.trace("isFleet({}) returned '{}'",prop, result);
-		return result;
-	}
 	
-	private boolean isUnsortedBatchRequired(DocumentProperty prop){
+	private boolean isUnsortedBatchRequired(Document doc){
 		boolean result = false;
-		if( isEnglish(prop) ){
+		if( doc.isEnglish() ){
 			if( !("X".equalsIgnoreCase( (String) params.getProperties().get("site.english.unsorted") ) ) ){
 				result = true;
 			}
@@ -232,22 +207,14 @@ public class CalculateBatchTypes {
 				result = true;
 			}
 		}
-		LOGGER.trace("isUnsortedBatchRequired({}) returned '{}'", prop, result);
+		LOGGER.trace("isUnsortedBatchRequired({}) returned '{}'", doc, result);
 		return result;
 	}
 	
-	private boolean isUnsorted(DocumentProperty prop){
-		boolean result = false;
-		if( prop.getDocDVLAMailsortCode() == null || prop.getDocDVLAMailsortCode().trim().isEmpty() ){
-			result = true;
-		}
-		LOGGER.trace("isUnsorted({}) returned '{}'", prop, result);
-		return result;
-	}
 	
-	private boolean isSortedBatchRequired(DocumentProperty prop){
+	private boolean isSortedBatchRequired(Document doc){
 		boolean result = false;
-		if( isEnglish(prop) ){
+		if( doc.isEnglish() ){
 			if( !("X".equalsIgnoreCase( (String) params.getProperties().get("site.english.sorted") ) ) ){
 				result = true;
 			}
@@ -256,13 +223,13 @@ public class CalculateBatchTypes {
 				result = true;
 			}
 		}
-		LOGGER.trace("isSortedBatchRequired({}) returned '{}'", prop, result);
+		LOGGER.trace("isSortedBatchRequired({}) returned '{}'", doc, result);
 		return result;
 	}
 	
-	private boolean isMultiBatchRequired(DocumentProperty prop){
+	private boolean isMultiBatchRequired(Document doc){
 		boolean result = false;
-		if( isEnglish(prop) ){
+		if( doc.isEnglish() ){
 			if(  !((String) params.getProperties().get("site.english.multi")).contains("X") && 
 					!((String) params.getProperties().get("site.english.multi")).contains("x")){
 				result = true;
@@ -273,20 +240,20 @@ public class CalculateBatchTypes {
 				result = true;
 			}
 		}
-		LOGGER.trace("isMultiBatchRequired({}) returned '{}'", prop, result);
+		LOGGER.trace("isMultiBatchRequired({}) returned '{}'", doc, result);
 		return result;
 	}
 	
-	private boolean isMulti(DocumentProperty prop){
-		boolean result = multiCustomers.contains(prop);
-		LOGGER.trace("isMulti({}) returned '{}'", prop, result);
+	private boolean isMulti(Document doc){
+		boolean result = multiCustomers.contains(doc);
+		LOGGER.trace("isMulti({}) returned '{}'", doc, result);
 		return result;
 	}
 	
 	
-	private boolean isSortingBatchRequired(DocumentProperty prop){
+	private boolean isSortingBatchRequired(Document doc){
 		boolean result = false;
-		if( isEnglish(prop) ){
+		if( doc.isEnglish() ){
 			if( !("X".equalsIgnoreCase( (String) params.getProperties().get("site.english.sorting") ) ) ){
 				result = true;
 			}
@@ -295,13 +262,13 @@ public class CalculateBatchTypes {
 				result = true;
 			}
 		}
-		LOGGER.trace("isSortingBatchRequired({}) returned '{}'", prop, result);
+		LOGGER.trace("isSortingBatchRequired({}) returned '{}'", doc, result);
 		return result;
 	}
 	
-	private boolean isRejectBatchRequired(DocumentProperty prop){
+	private boolean isRejectBatchRequired(Document doc){
 		boolean result = false;
-		if( isEnglish(prop) ){
+		if( doc.isEnglish() ){
 			if( !("X".equalsIgnoreCase( (String) params.getProperties().get("site.english.reject") ) ) ){
 				result = true;
 			}
@@ -310,13 +277,13 @@ public class CalculateBatchTypes {
 				result = true;
 			}
 		}
-		LOGGER.trace("isRejectBatchRequired({}) returned '{}'", prop, result);
+		LOGGER.trace("isRejectBatchRequired({}) returned '{}'", doc, result);
 		return result;
 	}
 	
-	private boolean isReprintBatchRequired(DocumentProperty prop){
+	private boolean isReprintBatchRequired(Document doc){
 		boolean result = false;
-		if( isEnglish(prop) ){
+		if( doc.isEnglish() ){
 			if( !("X".equalsIgnoreCase( (String) params.getProperties().get("site.english.reprint") ) ) ){
 				result = true;
 			}
@@ -325,23 +292,23 @@ public class CalculateBatchTypes {
 				result = true;
 			}
 		}
-		LOGGER.trace("isReprintBatchRequired({}) returned '{}'", prop, result);
+		LOGGER.trace("isReprintBatchRequired({}) returned '{}'", doc, result);
 		return result;
 	}
 	
 	private void assignGroupIds() {
 		LOGGER.debug("assignGroupIds() running..");
-		for( DocumentProperty prop : docProps ){
-			if( BatchTypes.valueOf(prop.getDocDVLABatchType()).equals(BatchTypes.FLEET) ){
-				prop.setDocDVLAGroupId("" + fleetMap.get(prop));
-			}else if( BatchTypes.valueOf(prop.getDocDVLABatchType()).equals(BatchTypes.CLERICAL) ){
-				prop.setDocDVLAGroupId("" + multiMap.get(prop));
-			}else if( BatchTypes.valueOf(prop.getDocDVLABatchType()).equals(BatchTypes.MULTI) ){
-				prop.setDocDVLAGroupId("" + multiMap.get(prop));
-			}else if( isEnglish(prop) && "X".equalsIgnoreCase((String) params.getProperties().get("site.english.multi")) ){
-				prop.setDocDVLAGroupId("" + multiMap.get(prop));
-			}else if( isWelsh(prop) && "X".equalsIgnoreCase((String) params.getProperties().get("site.welsh.multi")) ){
-				prop.setDocDVLAGroupId("" + multiMap.get(prop));
+		for( Document doc : docs ){
+			if( doc.getBatchType().equals(BatchTypes.FLEET) ){
+				doc.setGroupId("" + fleetMap.get(doc));
+			}else if( doc.getBatchType().equals(BatchTypes.CLERICAL) ){
+				doc.setGroupId("" + multiMap.get(doc));
+			}else if( doc.getBatchType().equals(BatchTypes.MULTI) ){
+				doc.setGroupId("" + multiMap.get(doc));
+			}else if( doc.isEnglish() && "X".equalsIgnoreCase((String) params.getProperties().get("site.english.multi")) ){
+				doc.setGroupId("" + multiMap.get(doc));
+			}else if( doc.isWelsh() && "X".equalsIgnoreCase((String) params.getProperties().get("site.welsh.multi")) ){
+				doc.setGroupId("" + multiMap.get(doc));
 			}
 		}
 	}
